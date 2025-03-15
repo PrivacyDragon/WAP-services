@@ -113,7 +113,6 @@ void main() {
 			} else {
 				reagent = bezoek.post("https://api-free.deepl.com/v2/translate", queryParams("text", tekst, "source_lang", oertaal, "target_lang", eindtaal));
 			}
-			//TODO: Actually use the HTTP response code...
 			ushort volgnummer = reagent.code;
 			if (volgnummer == 200) {//SUCCESS!
 				string reactie = reagent.responseBody.data.assumeUTF; //Bouw char[] om tot string, door in 'reactie' een immutabele versie te plaatsen, daar een string een 'immutable char[]' is.
@@ -192,8 +191,34 @@ void main() {
 </do>
 </card>
 </wml>");
+				//Quota exceeded
+			} else if (volgnummer == 456) {
+				write("<?xml version=\"1.0\"?>
+<!DOCTYPE wml PUBLIC \"-//WAPFORUM//DTD WML 1.1//EN\" \"http://www.wapforum.org/DTD/wml_1.1.xml\">
+<wml>
+<card id=\"a\" title=\"WapL\">
+<p align=\"center\">WAP Translate, powered by DeepL</p>
+<p><b>Oh No! My monthly translation limit has been reached!</b></p>
+<p>It is currently not possible to translate, because StoryDragon does not have the money for a paid plan with the DeepL API... :( :( :(</p>
+<do type=\"prev\" label=\"Back\">
+<prev/>
+</do>
+</card>
+</wml>");
 			} else {
 				//Give ERROR. For other HTTP return codes.
+				write("<?xml version=\"1.0\"?>
+<!DOCTYPE wml PUBLIC \"-//WAPFORUM//DTD WML 1.1//EN\" \"http://www.wapforum.org/DTD/wml_1.1.xml\">
+<wml>
+<card id=\"a\" title=\"WapL\">
+<p align=\"center\">WAP Translate, powered by DeepL</p>
+<p><b>Oh No! An error has occured!</b></p>
+<p>StoryDragon apologizes for the problem. Please tell him that the following HTTP error code showed up: ", volgnummer, "</p>
+<do type=\"prev\" label=\"Back\">
+<prev/>
+</do>
+</card>
+</wml>");
 			}
 		} else {
 			write("<?xml version=\"1.0\"?>
